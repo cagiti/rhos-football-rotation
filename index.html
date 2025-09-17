@@ -1,161 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rhos Football Planner</title>
+  <meta charset="UTF-8">
+  <title>Rhos FC Substitution Planner</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
     body {
-      font-family: 'Roboto', sans-serif;
-      background: url('https://images.unsplash.com/photo-1607773625812-9e03c0e04350?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: black;
+      font-family: Arial, sans-serif;
+      background-color: #001f3f;
+      color: #FFDC00;
       padding: 20px;
-      max-width: 800px;
-      margin: auto;
-      backdrop-filter: brightness(0.9);
-    }
-    .rhos {
-      position: absolute;
-      top: 0.5em;
-      left: 1em;
-      width: 80px;
-      height: 80px;
-      background-image: url('./img/rhos.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
-
-    .rhos.right {
-      left: auto;
-      right: 1em;
     }
 
     h1 {
       text-align: center;
-      color: navy;
-      text-shadow: 2px 2px 3px #FFFF00;
+      color: #FFDC00;
     }
 
-    label {
+    .badge {
       display: block;
-      margin-top: 10px;
-      font-weight: bold;
+      margin: 0 auto 20px auto;
+      height: 100px;
     }
 
-    input, select, textarea {
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #002b5c;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    label, textarea, input, select {
+      display: block;
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: none;
-      border-radius: 4px;
-      background: #f0f0f0;
-      color: #000;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: navy;
-      border: none;
-      border-radius: 4px;
-      color: #FFFF00;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #00994d;
-    }
-
-    .schedule {
-      margin-top: 20px;
-      white-space: pre-wrap;
-      background: white;
-      padding: 15px;
-      border-radius: 5px;
-      font-family: monospace;
+      margin-bottom: 15px;
+      font-size: 16px;
+      color: #FFDC00;
     }
 
     textarea {
-      background: #fff;
-      color: #000;
+      height: 140px;
+      resize: vertical;
+      color: #001f3f;
+    }
+
+    input, select {
+      padding: 8px;
+      background-color: #ffffff;
+      border: 1px solid #FFDC00;
+      border-radius: 4px;
+      color: #001f3f;
+    }
+
+    button {
+      background-color: #FFDC00;
+      color: #001f3f;
+      font-weight: bold;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #e6c800;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      background: #001933;
+      padding: 15px;
+      border-radius: 5px;
+      color: #ffffff;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="rhos"></div>
-    <div class="rhos right"></div>
-    <h1>Rhos Football Planner</h1>
-  </header>
 
-  <label>Players (one per line, mark goalkeeper with [GK]):</label>
-  <textarea id="players" rows="8">Jack [GK]
-Logan
-Seth
-Eli J
-Trystan
-Elis
-Macsen J
-Alfie
-Ewan
-</textarea>
+  <h1>Rhos FC Substitution Planner</h1>
+  <img class="badge" src="./img/rhos.png" alt="Club Badge">
 
-  <label>Match Duration (minutes):</label>
-  <input type="number" id="matchDuration" value="12"/>
+  <div class="container">
+    <label>Players (one per line, format: Name [POS])</label>
+    <textarea id="players">Alice [DEF]
+Bob [MID]
+Charlie [FWD]
+Dan [MID]
+Eve [DEF]
+Frank [FWD]
+Grace [MID]
+Helen [DEF]
+Tom [GK]</textarea>
 
-  <label>Include Halftime?</label>
-  <select id="halftime">
-    <option value="yes">Yes</option>
-    <option value="no" selected>No</option>
-  </select>
+    <label>Match Duration (minutes):</label>
+    <input type="number" id="matchDuration" value="60" />
 
-  <label>Players on the pitch (excluding GK):</label>
-  <input type="number" id="onPitch" value="5"/>
+    <label>Substitution Interval (minutes):</label>
+    <input type="number" id="interval" value="10" />
 
-  <label>Rotation interval (minutes):</label>
-  <input type="number" id="interval" value="3"/>
+    <label>Players on Pitch (excluding GK):</label>
+    <input type="number" id="onPitch" value="6" />
 
-  <button onclick="generateSchedule()">Generate Rotation Schedule</button>
+    <label>Players Substituted Per Interval:</label>
+    <input type="number" id="subsPerInterval" value="2" />
 
-  <div class="schedule" id="output"></div>
+    <label>Toggle Half‑Time Pause:</label>
+    <select id="halfTime">
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <button onclick="generateSchedule()">Generate Schedule</button>
+
+    <h2>Output</h2>
+    <pre id="output"></pre>
+  </div>
 
   <script>
     function generateSchedule() {
-      const playersRaw = document.getElementById("players").value.trim().split("\n");
-      const matchDuration = parseInt(document.getElementById("matchDuration").value);
-      const halftime = document.getElementById("halftime").value === "yes";
-      const interval = parseInt(document.getElementById("interval").value);
-      const onPitch = parseInt(document.getElementById("onPitch").value);
+      const playerLines = document.getElementById('players').value.trim().split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '');
 
-      const goalkeeper = playersRaw.find(p => p.includes("[GK]"));
-      const players = playersRaw.filter(p => !p.includes("[GK]"));
-
-      const rotations = Math.floor(matchDuration / interval);
-      const schedule = [];
-
-      let bench = [...players];
-      let playing = bench.splice(0, onPitch);
-
-      for (let i = 0; i <= rotations; i++) {
-        const time = i * interval;
-        schedule.push(`== Minute ${time}${halftime && time === matchDuration/2 ? " (Halftime)" : ""} ==`);
-        schedule.push(`Playing: ${[goalkeeper, ...playing].join(", ")}`);
-        schedule.push(`Bench: ${bench.join(", ")}`);
-        if (i < rotations) {
-          const rotatedOut = playing.shift();
-          playing.push(bench.shift());
-          bench.push(rotatedOut);
+      const playerPattern = /^(.+?)\s+\[(.+?)\]$/;
+      const players = playerLines.map(line => {
+        const match = line.match(playerPattern);
+        if (match) {
+          return { name: match[1].trim(), position: match[2].trim().toUpperCase() };
+        } else {
+          return { name: line.trim(), position: 'NONE' };
         }
-        schedule.push("");
+      });
+
+      const matchDuration = parseInt(document.getElementById('matchDuration').value);
+      const interval = parseInt(document.getElementById('interval').value);
+      const onPitch = parseInt(document.getElementById('onPitch').value);
+      const subsPerInterval = parseInt(document.getElementById('subsPerInterval').value);
+      const halfTimePause = document.getElementById('halfTime').value === 'true';
+
+      const numIntervals = Math.floor(matchDuration / interval);
+      let substitutionTimes = Array.from({ length: numIntervals }, (_, i) => (i + 1) * interval);
+      if (substitutionTimes[substitutionTimes.length - 1] === matchDuration) substitutionTimes.pop();
+      if (halfTimePause) {
+        const half = matchDuration / 2;
+        substitutionTimes = substitutionTimes.filter(t => t !== half);
       }
 
-      document.getElementById("output").textContent = schedule.join("\n");
+      const timePerPlayer = {};
+      players.forEach(p => timePerPlayer[p.name] = 0);
+
+      const gk = players.find(p => p.position === 'GK');
+      const outfieldPlayers = players.filter(p => p.position !== 'GK');
+
+      let onField = outfieldPlayers.slice(0, onPitch).map(p => p.name);
+      let bench = outfieldPlayers.slice(onPitch).map(p => p.name);
+
+      if (gk) {
+        onField.unshift(gk.name);
+      }
+
+      onField.forEach(p => {
+        timePerPlayer[p] += interval;
+      });
+
+      let schedule = '';
+      schedule += `Starting Lineup: ${onField.join(', ')}\n\n`;
+
+      substitutionTimes.forEach((time) => {
+        const currentOutfield = onField.filter(p => p !== (gk?.name ?? ''));
+
+        const playerMap = name => players.find(p => p.name === name);
+        const onFieldWithPos = currentOutfield.map(name => {
+          const p = playerMap(name);
+          return { name, position: p?.position ?? 'NONE' };
+        });
+
+        const benchWithPos = bench.map(name => {
+          const p = playerMap(name);
+          return { name, position: p?.position ?? 'NONE' };
+        });
+
+        const off = [];
+        const on = [];
+
+        for (let i = 0; i < subsPerInterval; i++) {
+          benchWithPos.sort((a, b) => timePerPlayer[a.name] - timePerPlayer[b.name]);
+          let candidateOn = benchWithPos.shift();
+          if (!candidateOn) continue;
+
+          let matchOff = onFieldWithPos
+            .filter(p => p.position === candidateOn.position)
+            .sort((a, b) => timePerPlayer[b.name] - timePerPlayer[a.name])[0];
+
+          if (!matchOff) {
+            matchOff = onFieldWithPos.sort((a, b) => timePerPlayer[b.name] - timePerPlayer[a.name])[0];
+          }
+
+          if (matchOff) {
+            off.push(matchOff.name);
+            on.push(candidateOn.name);
+            onFieldWithPos.splice(onFieldWithPos.findIndex(p => p.name === matchOff.name), 1);
+          }
+        }
+
+        bench = bench.filter(n => !on.includes(n)).concat(off);
+        onField = onField.filter(n => !off.includes(n)).concat(on);
+
+        onField.forEach(p => {
+          timePerPlayer[p] += interval;
+        });
+
+        schedule += `Minute ${time}:\n  Off: ${off.join(', ')}\n  On: ${on.join(', ')}\n  Current Lineup: ${onField.join(', ')}\n\n`;
+      });
+
+      const lastSubTime = substitutionTimes[substitutionTimes.length - 1] || 0;
+      const lastBlock = matchDuration - lastSubTime;
+      if (lastBlock > 0) {
+        onField.forEach(p => {
+          timePerPlayer[p] += lastBlock;
+        });
+      }
+
+      schedule += `\nFinal Playing Time:\n`;
+      players.forEach(p => {
+        schedule += `${p.name} [${p.position}]: ${timePerPlayer[p.name]} min\n`;
+      });
+
+      document.getElementById('output').innerText = schedule;
     }
   </script>
+
 </body>
 </html>
