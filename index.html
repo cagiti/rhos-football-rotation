@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rhos FC Substitution Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhos Football Rotation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -75,14 +77,25 @@
     }
   </style>
 </head>
-<body>
-
-  <h1>Rhos FC Substitution Planner</h1>
+<body class="bg-gray-900 text-gray-100">
+  <h1 class="text-3xl font-bold mb-6 text-center">Welcome to Rhos Football</h1>
   <img class="badge" src="./img/rhos.png" alt="Club Badge">
 
-  <div class="container">
-    <label>Players (one per line, format: Name [POS])</label>
-    <textarea id="players">Harri [GK]
+  <div class="max-w-5xl mx-auto py-6">
+
+    <!-- Tabs -->
+    <div class="flex border-b border-gray-700 mb-4">
+      <button class="tab-button px-4 py-2 text-gray-100 bg-gray-800 border-b-2 border-blue-600 font-semibold" data-tab="home">Substitutions</button>
+      <button class="tab-button px-4 py-2 text-gray-100 bg-gray-800 border-b-2 border-transparent hover:border-gray-500" data-tab="scheduler">Fixtures</button>
+    </div>
+
+    <!-- Tab Contents -->
+    <div id="home" class="tab-content">
+      <!-- Content from the existing index.html goes here -->
+
+       <div class="space-y-4 bg-gray-800 p-4 rounded-lg shadow">
+         <label>Players (one per line, format: Name [POS])</label>
+         <textarea id="players" class="w-full p-2 rounded bg-gray-700 border border-gray-600" >Harri [GK]
 Billy
 Trystan
 Ellis
@@ -90,30 +103,75 @@ Alf G
 Woody
 Seth
 Tom BT
-</textarea>
+         </textarea>
 
-    <label>Match Duration (minutes):</label>
-    <input type="number" id="matchDuration" value="60" />
+         <label>Match Duration (minutes):</label>
+         <input type="number" id="matchDuration" value="60" class="w-full p-2 rounded bg-gray-700 border border-gray-600"/>
 
-    <label>Substitution Interval (minutes):</label>
-    <input type="number" id="interval" value="5" />
+         <label>Substitution Interval (minutes):</label>
+         <input type="number" id="interval" value="5" class="w-full p-2 rounded bg-gray-700 border border-gray-600"/>
 
-    <label>Players on Pitch (excluding GK):</label>
-    <input type="number" id="onPitch" value="6" />
+         <label>Players on Pitch (excluding GK):</label>
+         <input type="number" id="onPitch" value="6" class="w-full p-2 rounded bg-gray-700 border border-gray-600"/>
 
-    <label>Players Substituted Per Interval:</label>
-    <input type="number" id="subsPerInterval" value="1" />
+         <label>Players Substituted Per Interval:</label>
+         <input type="number" id="subsPerInterval" value="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600"/>
 
-    <label>Toggle Half‑Time Pause:</label>
-    <select id="halfTime">
-      <option value="true">Yes</option>
-      <option value="false">No</option>
-    </select>
+         <label>Toggle Half‑Time Pause:</label>
+         <select id="halfTime" class="w-full p-2 rounded bg-gray-700 border border-gray-600">
+           <option value="true">Yes</option>
+           <option value="false">No</option>
+         </select>
 
-    <button onclick="generateSchedule()">Generate Schedule</button>
+         <button onclick="generateSchedule()" class="bg-yellow-600 hover:bg-grey-700 px-4 py-2 rounded text-white">Generate Schedule</button>
 
-    <h2>Output</h2>
-    <pre id="output"></pre>
+         <h2>Output</h2>
+         <pre id="output"></pre>
+       </div>
+    </div>
+
+    <div id="scheduler" class="tab-content hidden">
+      <!-- Scheduler content goes here -->
+      <div class="space-y-4 bg-gray-800 p-4 rounded-lg shadow">
+        <div>
+          <label class="block text-sm font-medium mb-1">Location (optional)</label>
+          <input id="location" type="text" class="w-full p-2 rounded bg-gray-700 border border-gray-600" placeholder="Rhos Park">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Number of Pitches</label>
+            <input id="pitches" type="number" value="2" min="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Total Duration (mins)</label>
+            <input id="totalDuration" type="number" value="60" min="10" class="w-full p-2 rounded bg-gray-700 border border-gray-600">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Max Playtime per Team (mins)</label>
+            <input id="maxPlaytime" type="number" value="30" min="5" class="w-full p-2 rounded bg-gray-700 border border-gray-600">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Gap Between Rounds (mins)</label>
+            <input id="gap" type="number" value="3" min="0" max="10" class="w-full p-2 rounded bg-gray-700 border border-gray-600">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Teams (one per line)</label>
+          <textarea id="teams" rows="6" class="w-full p-2 rounded bg-gray-700 border border-gray-600" placeholder="Team A&#10;Team B&#10;Team C"></textarea>
+        </div>
+
+        <div class="pt-2">
+          <button id="generateBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">Generate Fixtures</button>
+        </div>
+      </div>
+
+      <div id="warning" class="mt-4 text-red-400 font-semibold hidden"></div>
+      <div id="output2" class="mt-6"></div>
+      <div id="summary" class="mt-6"></div>
+    </div>
+
   </div>
 
   <script>
@@ -228,6 +286,121 @@ Tom BT
 
       document.getElementById('output').innerText = schedule;
     }
+    (() => {
+      const el = id => document.getElementById(id);
+
+      // Tab functionality
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.dataset.tab;
+          document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+          document.querySelectorAll('.tab-button').forEach(b => {
+            b.classList.remove('border-blue-600','font-semibold');
+            b.classList.add('border-transparent');
+          });
+          el(target).classList.remove('hidden');
+          btn.classList.add('border-blue-600','font-semibold');
+          btn.classList.remove('border-transparent');
+        });
+      });
+
+      function formatTime(minutes){
+        const hh = Math.floor(minutes / 60);
+        const mm = minutes % 60;
+        return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+      }
+
+      function generateFixtures(){
+        const pitches = Math.max(1, parseInt(el('pitches').value,10) || 1);
+        const totalDuration = Math.max(10, parseInt(el('totalDuration').value,10) || 10);
+        const maxPlaytime = Math.max(5, parseInt(el('maxPlaytime').value,10) || 5);
+        const gap = Math.max(0, Math.min(10, parseInt(el('gap').value,10) || 3));
+        const teams = el('teams').value.split('\n').map(t=>t.trim()).filter(Boolean);
+
+        const warningEl = el('warning'), outputEl = el('output2'), summaryEl = el('summary');
+        warningEl.classList.add('hidden'); warningEl.textContent='';
+        outputEl.innerHTML=''; summaryEl.innerHTML='';
+
+        if(teams.length<2){ warningEl.textContent="Enter at least 2 teams."; warningEl.classList.remove('hidden'); return; }
+
+        const odd = teams.length % 2 !== 0;
+        const allTeams = odd ? [...teams,"BYE"] : [...teams];
+        const n = allTeams.length;
+
+        // Round-robin circle method
+        let roundPairs = [], indices=[...Array(n).keys()];
+        for(let r=0;r<n-1;r++){
+          let round=[];
+          for(let i=0;i<n/2;i++){
+            const t1=allTeams[indices[i]], t2=allTeams[indices[n-1-i]];
+            if(t1!=="BYE" && t2!=="BYE") round.push({a:t1,b:t2});
+          }
+          roundPairs.push(round);
+          indices.splice(1,0,indices.pop());
+        }
+
+        // Flatten matches into rounds respecting pitches
+        let rounds=[];
+        roundPairs.forEach(round=>{
+          let unscheduled=[...round];
+          while(unscheduled.length>0){
+            let currentRound=[], usedTeams=new Set();
+            for(let i=0;i<unscheduled.length && currentRound.length<pitches;){
+              const match=unscheduled[i];
+              if(!usedTeams.has(match.a)&&!usedTeams.has(match.b)){
+                currentRound.push(match);
+                usedTeams.add(match.a); usedTeams.add(match.b);
+                unscheduled.splice(i,1);
+              } else i++;
+            }
+            rounds.push(currentRound);
+          }
+        });
+
+        const numRounds = rounds.length;
+        const totalAvailableMatchTime = totalDuration - (numRounds * gap);
+        const matchDuration = Math.floor(totalAvailableMatchTime / numRounds);
+
+        // Schedule matches with times
+        let schedule=[], currentTime=0;
+        rounds.forEach(round=>{
+          round.forEach((m,idx)=>{ m.pitch=idx+1; m.start=currentTime; m.end=currentTime+matchDuration; schedule.push(m); });
+          currentTime+=matchDuration+gap;
+        });
+
+        if(currentTime-gap>totalDuration){ warningEl.textContent="Not all matches fit within total duration."; warningEl.classList.remove('hidden'); }
+
+        // Fixture table
+        let html=`<table class="w-full mt-4 border border-gray-700">
+          <thead class="bg-gray-700"><tr>
+          <th class="px-4 py-2 text-left">Start</th>
+          <th class="px-4 py-2 text-left">End</th>
+          <th class="px-4 py-2 text-left">Pitch</th>
+          <th class="px-4 py-2 text-left">Match</th>
+          </tr></thead><tbody>`;
+
+        const teamPlaytime={}; teams.forEach(t=>teamPlaytime[t]=0);
+        schedule.forEach(m=>{
+          html+=`<tr class="border-t border-gray-700">
+          <td class="px-4 py-2">${formatTime(m.start)}</td>
+          <td class="px-4 py-2">${formatTime(m.end)}</td>
+          <td class="px-4 py-2">Pitch ${m.pitch}</td>
+          <td class="px-4 py-2">${m.a} vs ${m.b}</td>
+          </tr>`;
+          teamPlaytime[m.a]+=matchDuration; teamPlaytime[m.b]+=matchDuration;
+        });
+        html+='</tbody></table>'; outputEl.innerHTML=html;
+
+        // Team summary
+        let summaryHtml=`<h2 class="text-xl font-bold mt-6 mb-2">Total Playtime per Team</h2>`;
+        summaryHtml+=`<table class="w-full border border-gray-700">
+          <thead class="bg-gray-700"><tr><th class="px-4 py-2 text-left">Team</th><th class="px-4 py-2 text-left">Total Minutes Played</th></tr></thead><tbody>`;
+        teams.forEach(t=>{ summaryHtml+=`<tr class="border-t border-gray-700"><td class="px-4 py-2">${t}</td><td class="px-4 py-2">${teamPlaytime[t]}</td></tr>`; });
+        summaryHtml+='</tbody></table>'; summaryEl.innerHTML=summaryHtml;
+      }
+
+      el('generateBtn').addEventListener('click',generateFixtures);
+    })();
   </script>
 
 </body>
